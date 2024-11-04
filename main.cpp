@@ -10,7 +10,7 @@ int main(ON_DEBUG(const int argc, const char** argv))
     List_t list = {};
     if (ListCtor(&list) != 0) return -1;
 
-    INSERT(0, 33)
+    INSERT(0, 32)
     INSERT(0, 25)
     INSERT(1, 30)
     INSERT(0, 1)

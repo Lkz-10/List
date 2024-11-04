@@ -177,8 +177,7 @@ int ListVerify(List_t* list)
 
     for (int i = 1; i < list->size; ++i)
     {
-        if (list->prev[i] != -1 && list->prev[i] != 0 && list->next[i] != 0 &&
-            (list->next[list->prev[i]] != i || list->prev[list->next[i]] != i))
+        if (list->prev[i] != -1 && (list->next[list->prev[i]] != i || list->prev[list->next[i]] != i))
         {
             fprintf(stderr, "List verification error\n");
             ListDtor(list);

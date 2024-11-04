@@ -3,7 +3,7 @@ digraph G
    rankdir=LR;
    info [shape = Mrecord, label = "size =   8 | count =   4 | free =   5" ];
    0 [shape = Mrecord, label = "  0 | data = -111111 | prev =   2 | next =   4" ];
-   1 [shape = Mrecord, label = "  1 | data =      33 | prev =   3 | next =   2" ];
+   1 [shape = Mrecord, label = "  1 | data =      32 | prev =   3 | next =   2" ];
    2 [shape = Mrecord, label = "  2 | data =    1925 | prev =   1 | next =   0" ];
    3 [shape = Mrecord, label = "  3 | data =      30 | prev =   4 | next =   1" ];
    4 [shape = Mrecord, label = "  4 | data =       1 | prev =   0 | next =   3" ];
