@@ -2,6 +2,7 @@
 
 int ListInsert(List_t* list, int index, list_elem_t val)
 {
+    //ListDump(list, "Dump.dot");
     LIST_VERIFY
 
     if (index < 0 || index > list->count)
@@ -15,6 +16,7 @@ int ListInsert(List_t* list, int index, list_elem_t val)
     if (list->free == 0)
     {
         if (ListRealloc(list) != 0) return -1;
+        //ListDump(list, "Dump.dot");
     }
 
     (list->count)++;
@@ -22,6 +24,15 @@ int ListInsert(List_t* list, int index, list_elem_t val)
     int free_index = list->free;
 
     list->free = list->next[free_index];
+
+    int real_index = 0;
+
+    for (int i = 0; i < index; ++i)
+    {
+        real_index = list->next[real_index];
+    }
+
+    index = real_index;
 
     list->next[free_index] = list->next[index];
     list->next[index]      = free_index;
@@ -80,6 +91,15 @@ int ListErase(List_t* list, int index)
         return -1;
     }
 
+    int real_index = 0;
+
+    for (int i = 0; i < index; ++i)
+    {
+        real_index = list->next[real_index];
+    }
+
+    index = real_index;
+
     list->next[list->prev[index]] = list->next[index];
     list->prev[list->next[index]] = list->prev[index];
 
@@ -98,11 +118,14 @@ int ListDump(List_t* list, const char* file_name)
 {
     FILE* file_ptr = fopen(file_name, "w");
 
-    fprintf(file_ptr, "digraph G\n{\n   rankdir=UD;\n");
+    fprintf(file_ptr, "digraph G\n{\n   rankdir=LR;\n");
+
+    fprintf(file_ptr, "   info [shape = Mrecord, label = \"size = %3d | count = %3d | free = %3d\" ];\n",
+            list->size, list->count, list->free);
 
     for (int i = 0; i < list->size; ++i)
     {
-        fprintf(file_ptr, "%4d [shape = Mrecord, label = \"{%3d | data = %7d | prev = %3d | next = %3d}\" ];\n",
+        fprintf(file_ptr, "%4d [shape = Mrecord, label = \"%3d | data = %7d | prev = %3d | next = %3d\" ];\n",
                 i, i, list->data[i], list->prev[i], list->next[i]);
     }
 
@@ -127,38 +150,6 @@ int ListDump(List_t* list, const char* file_name)
 
     system("dot Dump.dot -Tpng -o Dump.png");
 
-//     fprintf(file_ptr, "List [%p]:\n{\n", list);
-//     assert(list);
-//
-//     fprintf(file_ptr, "Size = %d, count = %d\n\n", list->size, list->count);
-//
-//     fprintf(file_ptr, "Data [%p]:   ", list->data);
-//     assert(list->data);
-//
-//     for (int i = 0; i < list->size; ++i)
-//     {
-//         fprintf(file_ptr, "%7d   ", list->data[i]);
-//     }
-//     fprintf(file_ptr, "\n\n");
-//
-//     fprintf(file_ptr, "Next [%p]:   ", list->next);
-//     assert(list->next);
-//
-//     for (int i = 0; i < list->size; ++i)
-//     {
-//         fprintf(file_ptr, "%7d   ", list->next[i]);
-//     }
-//     fprintf(file_ptr, "\nfree: %d\n\n", list->free);
-//
-//     fprintf(file_ptr, "Prev [%p]:   ", list->prev);
-//     assert(list->prev);
-//
-//     for (int i = 0; i < list->size; ++i)
-//     {
-//         fprintf(file_ptr, "%7d   ", list->prev[i]);
-//     }
-//     fprintf(file_ptr, "\n}\n\n");
-
     return 0;
 }
 
@@ -171,7 +162,7 @@ int ListVerify(List_t* list)
 
     int index = list->free;
 
-    while (list->next[index] != 0)
+    while (index != 0 && list->next[index] != 0)
     {
         if (list->prev[index] != -1)
         {
@@ -181,7 +172,7 @@ int ListVerify(List_t* list)
             return -1;
         }
 
-        index++;
+        index = list->next[index];
     }
 
     for (int i = 1; i < list->size; ++i)

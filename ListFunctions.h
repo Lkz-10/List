@@ -16,6 +16,6 @@ int ListDump    (List_t* list, const char* file_name);
 int ListInsert  (List_t* list, int index, list_elem_t val);
 int ListRealloc (List_t* list);
 
-int ListErase  (List_t* list, int index);
+int ListErase   (List_t* list, int index);
 
 #endif
