@@ -19,7 +19,7 @@ int main(ON_DEBUG(const int argc, const char** argv))
 
     INSERT(3, 1925)
 
-    ListDump(&list, argv[1]);
+    ListDump(&list, argv[1], "Dump is called because of Zenit is the champion (no bug!)");
 
     ListDtor(&list);
 

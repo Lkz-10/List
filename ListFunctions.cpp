@@ -2,7 +2,6 @@
 
 int ListInsert(List_t* list, int index, list_elem_t val)
 {
-    //ListDump(list, "Dump.dot");
     LIST_VERIFY
 
     if (index < 0 || index > list->count)
@@ -16,7 +15,6 @@ int ListInsert(List_t* list, int index, list_elem_t val)
     if (list->free == 0)
     {
         if (ListRealloc(list) != 0) return -1;
-        //ListDump(list, "Dump.dot");
     }
 
     (list->count)++;
@@ -24,15 +22,6 @@ int ListInsert(List_t* list, int index, list_elem_t val)
     int free_index = list->free;
 
     list->free = list->next[free_index];
-
-    int real_index = 0;
-
-    for (int i = 0; i < index; ++i)
-    {
-        real_index = list->next[real_index];
-    }
-
-    index = real_index;
 
     list->next[free_index] = list->next[index];
     list->next[index]      = free_index;
@@ -91,15 +80,6 @@ int ListErase(List_t* list, int index)
         return -1;
     }
 
-    int real_index = 0;
-
-    for (int i = 0; i < index; ++i)
-    {
-        real_index = list->next[real_index];
-    }
-
-    index = real_index;
-
     list->next[list->prev[index]] = list->next[index];
     list->prev[list->next[index]] = list->prev[index];
 
@@ -114,22 +94,46 @@ int ListErase(List_t* list, int index)
     return 0;
 }
 
-int ListDump(List_t* list, const char* file_name)
+int ListDump(List_t* list, const char* file_name, const char* dump_reason)
 {
     FILE* file_ptr = fopen(file_name, "w");
 
     fprintf(file_ptr, "digraph G\n{\n   rankdir=LR;\n");
 
-    fprintf(file_ptr, "   info [shape = Mrecord, label = \"size = %3d | count = %3d | free = %3d\" ];\n",
+    fprintf(file_ptr, "   info [shape = Mrecord,  label = \"size = %3d | count = %3d | free = %3d\" ];\n",
             list->size, list->count, list->free);
 
-    for (int i = 0; i < list->size; ++i)
+    int index = list->next[0];
+
+    while (index != 0)
     {
-        fprintf(file_ptr, "%4d [shape = Mrecord, label = \"%3d | data = %7d | prev = %3d | next = %3d\" ];\n",
-                i, i, list->data[i], list->prev[i], list->next[i]);
+        fprintf(file_ptr, "%4d [shape = Mrecord, style = \"filled\", fillcolor = \"darkseagreen1\","
+                "label = \"%3d | data = %7d | prev = %3d | next = %3d\" ];\n",
+                index, index, list->data[index], list->prev[index], list->next[index]);
+
+        index = list->next[index];
     }
 
-    fprintf(file_ptr, "   edge[color=\"green\"];\n");
+    fprintf(file_ptr, "%4d [shape = Mrecord, style = \"filled\", fillcolor = \"khaki1\","
+            "label = \"%3d | data = %7d | prev = %3d | next = %3d\" ];\n",
+            index, index, list->data[index], list->prev[index], list->next[index]);
+
+    index = list->free;
+
+    while (index != 0)
+    {
+        fprintf(file_ptr, "%4d [shape = Mrecord, style = \"filled\", fillcolor = \"pink\","
+                "label = \"%3d | data = %7d | prev = %3d | next = %3d\" ];\n",
+                index, index, list->data[index], list->prev[index], list->next[index]);
+
+        index = list->next[index];
+    }
+
+    fprintf(file_ptr, "description [color = \"white\", label = \"%s\"];\n", dump_reason);
+
+    fprintf(file_ptr, "info -> %d;\n", list->free);
+
+    fprintf(file_ptr, "   edge[color=\"fuchsia\"];\n");
 
     for (int i = 0; i < list->size; ++i)
     {
@@ -141,7 +145,7 @@ int ListDump(List_t* list, const char* file_name)
     for (int i = 0; i < list->size; ++i)
     {
         if (list->prev[i] == -1) continue;
-        fprintf(file_ptr, "%4d -> %d;\n", list->prev[i], i);
+        fprintf(file_ptr, "%4d -> %d;\n", i, list->prev[i]);
     }
 
     fprintf(file_ptr, "}\n");
